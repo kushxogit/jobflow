@@ -1,0 +1,161 @@
+{
+  "name": "Kushagra Mundra",
+  "headline": "Software Engineer | Backend / Full Stack | Node.js, TypeScript, Python, APIs, Automation, AWS | 2+ years",
+  "location": "India",
+
+  "target_role_families": {
+    "primary": ["software_engineer", "backend_engineer", "full_stack_engineer", "integration_engineer"],
+    "secondary": ["product_engineer", "platform_engineer", "solutions_engineer", "implementation_engineer"]
+  },
+
+  "target_roles": [
+    "Software Engineer",
+    "Software Developer",
+    "Backend Engineer",
+    "Backend Developer",
+    "Full Stack Engineer",
+    "Full Stack Developer",
+    "Product Engineer",
+    "Integration Engineer",
+    "Implementation Engineer",
+    "Solutions Engineer",
+    "SDE 1",
+    "SDE 2",
+    "Node.js Developer",
+    "Python Developer",
+    "API Integration Engineer"
+  ],
+
+  "work_mode_preferences": {
+    "allowed": ["remote", "hybrid"],
+    "preferred_order": ["remote", "hybrid"],
+    "remote_score": 1.0,
+    "hybrid_score": 0.45
+  },
+
+  "salary_constraints": {
+    "minimum_monthly_inr": 50000,
+    "target_monthly_inr": 80000,
+    "stretch_monthly_inr": 120000,
+    "currency": "INR",
+    "infer_if_missing": true
+  },
+
+  "experience_constraints": {
+    "ideal_min_years": 1,
+    "ideal_max_years": 4,
+    "soft_max_years": 5
+  },
+
+  "freshness_constraints": {
+    "hard_max_age_days": 21,
+    "half_life_days": 5
+  },
+
+  "skills_tier_1": [
+    "Node.js", "TypeScript", "JavaScript", "Python", "React",
+    "Express", "FastAPI", "REST APIs", "MongoDB", "AWS",
+    "CI/CD", "WebSockets", "Automation", "Third-party Integrations"
+  ],
+
+  "skills_tier_2": [
+    "Cloudflare Workers", "AWS S3", "System Design", "Microservices",
+    "Server-side Tracking", "Real-time Features", "E-commerce Infrastructure"
+  ],
+
+  "skills_tier_3": [
+    "Airtable", "Make.com", "Liquid", "Meta Ads API",
+    "Google Analytics 4", "WordPress API", "CometChat"
+  ],
+
+  "skills": [
+    "Node.js", "TypeScript", "JavaScript", "Python", "React",
+    "Express", "FastAPI", "REST APIs", "MongoDB", "AWS",
+    "CI/CD", "WebSockets", "Automation", "Third-party Integrations",
+    "Cloudflare Workers", "AWS S3", "System Design", "Microservices",
+    "Server-side Tracking", "Real-time Features", "E-commerce Infrastructure",
+    "Airtable", "Make.com", "Liquid", "Meta Ads API",
+    "Google Analytics 4", "WordPress API", "CometChat"
+  ],
+
+  "keywords": [
+    "full stack", "backend", "product engineer", "api architecture",
+    "automation", "workflow automation", "real-time systems", "websockets",
+    "server-side tracking", "cloudflare workers", "aws", "react",
+    "node.js", "integrations", "e-commerce", "analytics",
+    "system design", "software engineer"
+  ],
+
+  "seniority": "mid-level",
+  "experience_years": 2,
+
+  "company_stage_preferences": ["startup", "seed", "series a", "series b", "product"],
+
+  "industries": ["saas", "e-commerce", "automation", "marketing technology", "developer tools", "product software"],
+
+  "locations": ["Remote", "India"],
+
+  "resume_path": "resume/base.docx",
+  "resume_base_path": "resume/base.docx",
+
+  "summary": "Product-minded Full-Stack Engineer with 2+ years of experience building production-grade APIs, automation systems, and real-time product features. Experienced across the full delivery lifecycle, from backend architecture and system design to React frontends, third-party integrations, and cloud deployment. Built server-side attribution systems, workflow automation pipelines, API platforms, analytics instrumentation, and e-commerce infrastructure with a strong focus on ownership, clean code, and business impact.",
+
+  "strengths": [
+    "Backend architecture and API design",
+    "Workflow and operations automation",
+    "Real-time product features",
+    "Third-party API integrations",
+    "Analytics and measurement implementation",
+    "E-commerce systems",
+    "Independent ownership of production systems",
+    "Performance optimization"
+  ],
+
+  "current_role": "Software Engineer II",
+  "current_company": "FML",
+
+  "previous_roles": [
+    {"company": "FML", "title": "Software Engineer II", "start": "May 2025", "end": "Present", "mode": "Remote"},
+    {"company": "Better Software", "title": "Software Engineer I", "start": "Sept 2023", "end": "March 2025", "mode": "Remote"}
+  ],
+
+  "experience_highlights": [
+    "Built a server-side Meta Pixel conversion tracking system using Cloudflare Workers for cookie-independent attribution.",
+    "Designed and shipped an automated order-to-dispatch pipeline using Make.com, Airtable, and custom Node.js, reducing manual ops overhead by about 80%.",
+    "Implemented a full Google Analytics 4 measurement strategy with custom events, funnels, and user path exploration.",
+    "Engineered an end-to-end storefront using Liquid and JavaScript with payment gateway integration and post-purchase automation.",
+    "Redesigned REST API architecture in Node.js and Express with cursor-based pagination and AWS S3 offloading, reducing average response time by 35%.",
+    "Integrated Google Maps, Google Solar API, and NREL Energy Data APIs into a real-time proposal generation engine, driving a 20% lift in user engagement.",
+    "Built a React and Node.js lead generation platform with workflow automation, improving team operational efficiency by 15%.",
+    "Shipped real-time communication features using CometChat and WebSockets and built interactive map-based data visualization in React.",
+    "Built Airtable and WordPress bidirectional sync pipelines to eliminate recurring manual ops errors.",
+    "Optimized frontend component architecture across platforms, reducing page load time by 30%."
+  ],
+
+  "domains": [
+    "API platforms", "automation systems", "real-time collaboration", "analytics",
+    "ad tracking", "e-commerce", "lead generation", "CRM sync", "proposal generation"
+  ],
+
+  "tools_and_platforms": [
+    "AWS S3", "Cloudflare Workers", "Airtable", "Make.com",
+    "Google Maps API", "Google Solar API", "NREL Energy Data APIs",
+    "CometChat", "WordPress API", "Meta Pixel", "Meta Ads API", "Google Analytics 4"
+  ],
+
+  "education": {
+    "degree": "B.Tech",
+    "field": "Computer Science & Engineering",
+    "institution": "Swami Keshvanand Institute of Technology",
+    "start_year": 2020,
+    "end_year": 2024,
+    "gpa": "8.4/10",
+    "location": "Jaipur, India"
+  },
+
+  "desired_salary_min": 50000,
+  "desired_salary_currency": "INR",
+  "remote_preference": "remote",
+  "posted_within_days": 21,
+  "target_job_count": 150
+}

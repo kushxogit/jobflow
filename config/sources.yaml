@@ -1,0 +1,102 @@
+{
+  "sources": [
+    {
+      "kind": "fixture",
+      "name": "Demo Jobs",
+      "enabled": false,
+      "fixture_path": "data/fixtures/sample_jobs.json",
+      "max_results": 5,
+      "pages": 1,
+      "search_queries": [
+        "python automation"
+      ]
+    },
+    {
+      "kind": "linkedin_playwright",
+      "name": "LinkedIn Jobs",
+      "enabled": true,
+      "priority": 1.0,
+      "max_results": 1000,
+      "pages": 20,
+      "location_hint": "India",
+      "search_queries": [
+        "software engineer",
+        "backend engineer",
+        "full stack engineer",
+        "software developer",
+        "node js developer",
+        "python developer",
+        "product engineer",
+        "integration engineer",
+        "implementation engineer",
+        "solutions engineer",
+        "sde 1",
+        "sde 2",
+        "hybrid software engineer",
+        "hybrid backend engineer",
+        "hybrid full stack engineer"
+      ]
+    },
+    {
+      "kind": "naukri_playwright",
+      "name": "Naukri Jobs",
+      "enabled": true,
+      "priority": 0.88,
+      "max_results": 300,
+      "pages": 5,
+      "location_hint": "India",
+      "search_queries": [
+        "software engineer",
+        "backend developer",
+        "full stack developer",
+        "node js developer",
+        "python developer",
+        "hybrid software engineer",
+        "hybrid backend developer"
+      ]
+    },
+    {
+      "kind": "indeed_playwright",
+      "name": "Indeed Jobs",
+      "enabled": true,
+      "priority": 0.78,
+      "max_results": 300,
+      "pages": 10,
+      "location_hint": "India",
+      "search_queries": [
+        "python backend engineer",
+        "software engineer",
+        "full stack python node",
+        "fastapi django developer",
+        "ai engineer"
+      ]
+    },
+    {
+      "kind": "wellfound_playwright",
+      "name": "Wellfound Jobs",
+      "enabled": true,
+      "priority": 0.92,
+      "max_results": 300,
+      "pages": 10,
+      "search_queries": [
+        "backend engineer",
+        "full stack engineer",
+        "product engineer",
+        "software engineer"
+      ]
+    },
+    {
+      "kind": "surely_remote_playwright",
+      "name": "SurelyRemote Jobs",
+      "enabled": true,
+      "priority": 0.8,
+      "max_results": 200,
+      "pages": 3,
+      "search_queries": [
+        "remote python",
+        "remote backend",
+        "remote full stack"
+      ]
+    }
+  ]
+}
