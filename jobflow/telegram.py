@@ -79,7 +79,14 @@ class TelegramClient:
 
     def send_review_card(self, score: JobScore) -> dict[str, Any]:
         """Send an individual interactive Approve / Skip card for a job."""
-        callback_id = score.job.raw_payload.get("fingerprint", score.job.source_job_id or score.job.url)
+        callback_id = score.job.raw_payload.get("fingerprint")
+        if not callback_id:
+            import hashlib
+            val = score.job.url or score.job.title or ""
+            callback_id = hashlib.sha256(val.encode("utf-8")).hexdigest()[:32]
+        else:
+            callback_id = str(callback_id)[:32]
+            
         keyboard = {
             "inline_keyboard": [
                 [

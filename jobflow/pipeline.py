@@ -102,7 +102,7 @@ class JobFlowPipeline:
         if shortlisted:
             for score in shortlisted:
                 fingerprint = self.store.fingerprint_for(score.job)
-                score.job.raw_payload = {**score.job.raw_payload, "fingerprint": fingerprint}
+                score.job.raw_payload = {**score.job.raw_payload, "fingerprint": fingerprint[:32]}
 
         # Update filtered jobs status in SQLite
         for score in scoring_result.scores:

@@ -227,10 +227,16 @@ class JobStore:
     def get_notion_page_id_by_fingerprint(self, fingerprint: str) -> str:
         """Retrieve the Notion page ID directly by fingerprint."""
         with self._connect() as connection:
-            row = connection.execute(
-                "SELECT notion_page_id FROM seen_jobs WHERE fingerprint = ?",
-                (fingerprint,),
-            ).fetchone()
+            if len(fingerprint) < 64:
+                row = connection.execute(
+                    "SELECT notion_page_id FROM seen_jobs WHERE fingerprint LIKE ?",
+                    (f"{fingerprint}%",),
+                ).fetchone()
+            else:
+                row = connection.execute(
+                    "SELECT notion_page_id FROM seen_jobs WHERE fingerprint = ?",
+                    (fingerprint,),
+                ).fetchone()
         if row is None:
             return ""
         return str(row["notion_page_id"] or "")
@@ -258,10 +264,16 @@ class JobStore:
 
     def load_job(self, fingerprint: str) -> JobListing | None:
         with self._connect() as connection:
-            row = connection.execute(
-                "SELECT raw_json FROM seen_jobs WHERE fingerprint = ?",
-                (fingerprint,),
-            ).fetchone()
+            if len(fingerprint) < 64:
+                row = connection.execute(
+                    "SELECT raw_json FROM seen_jobs WHERE fingerprint LIKE ?",
+                    (f"{fingerprint}%",),
+                ).fetchone()
+            else:
+                row = connection.execute(
+                    "SELECT raw_json FROM seen_jobs WHERE fingerprint = ?",
+                    (fingerprint,),
+                ).fetchone()
         if row is None:
             return None
         payload = json.loads(row["raw_json"])

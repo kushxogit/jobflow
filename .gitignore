@@ -11,4 +11,6 @@ outputs/
 debug_linkedin.html
 jobflow.egg-info/
 data/playwright_profile/
+Default/
+*.log
 
