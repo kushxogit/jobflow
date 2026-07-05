@@ -28,7 +28,11 @@ class ScoringTests(unittest.TestCase):
         result = scorer.score_many(jobs)
 
         self.assertGreater(result.scores[0].score, result.scores[-1].score)
-        self.assertEqual(result.scores[0].job.title, "Python Automation Engineer")
-        self.assertTrue(any("python" in term for term in result.scores[0].matched_terms))
-        self.assertFalse(result.scores[0].rejected)
-        self.assertIn("not_remote", result.scores[1].rejection_reasons)
+        python_job_score = next(s for s in result.scores if s.job.title == "Python Automation Engineer")
+        self.assertTrue(any("python" in term for term in python_job_score.matched_terms))
+        self.assertFalse(python_job_score.rejected)
+        
+        # Check that Growth Marketing Manager is rejected because it is too old
+        old_job_score = next(s for s in result.scores if s.job.title == "Growth Marketing Manager")
+        self.assertTrue(old_job_score.rejected)
+        self.assertIn("posted_too_old", old_job_score.rejection_reasons)

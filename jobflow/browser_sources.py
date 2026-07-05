@@ -109,12 +109,14 @@ class PlaywrightJobSource(BaseSource):
                         "--use-fake-ui-for-media-stream",
                     ],
                 )
-                # Give slow sites like LinkedIn more time to respond
-                context.set_default_timeout(60000)
-                context.set_default_navigation_timeout(60000)
-                page = context.new_page()
-                listings = self._crawl(page)
-                context.close()
+                try:
+                    # Give slow sites like LinkedIn more time to respond
+                    context.set_default_timeout(60000)
+                    context.set_default_navigation_timeout(60000)
+                    page = context.new_page()
+                    listings = self._crawl(page)
+                finally:
+                    context.close()
             except Exception as exc:
                 print(f"[Playwright] Error in source {self.name}: {exc}")
         return self._limit(listings)
@@ -235,6 +237,16 @@ class LinkedInPlaywrightSource(PlaywrightJobSource):
                         if "?" in job_url:
                             job_url = job_url.split("?")[0]
 
+                        easy_apply_button = page.locator(".jobs-apply-button, button:has-text('Easy Apply'), span:has-text('Easy Apply')").first
+                        is_easy_apply = False
+                        try:
+                            if easy_apply_button.is_visible():
+                                btn_text = easy_apply_button.inner_text().lower()
+                                if "easy apply" in btn_text or "easy" in btn_text:
+                                    is_easy_apply = True
+                        except Exception:
+                            pass
+
                         salary_min, salary_max, salary_currency = self._parse_salary(description)
                         jobs.append(
                             JobListing(
@@ -251,6 +263,7 @@ class LinkedInPlaywrightSource(PlaywrightJobSource):
                                 salary_min=salary_min,
                                 salary_max=salary_max,
                                 salary_currency=salary_currency,
+                                is_direct_apply=is_easy_apply,
                             )
                         )
                     except Exception as card_exc:
@@ -492,6 +505,14 @@ class IndeedPlaywrightSource(PlaywrightJobSource):
                         if link_el.is_visible():
                             job_url = "https://in.indeed.com" + (link_el.get_attribute("href") or "")
 
+                        indeed_apply_button = page.locator("#indeedApplyButton, .indeed-apply-button, button:has-text('Apply now')").first
+                        is_indeed_apply = False
+                        try:
+                            if indeed_apply_button.is_visible():
+                                is_indeed_apply = True
+                        except Exception:
+                            pass
+
                         salary_min, salary_max, salary_currency = self._parse_salary(description)
                         jobs.append(
                             JobListing(
@@ -507,6 +528,7 @@ class IndeedPlaywrightSource(PlaywrightJobSource):
                                 salary_min=salary_min,
                                 salary_max=salary_max,
                                 salary_currency=salary_currency,
+                                is_direct_apply=is_indeed_apply,
                             )
                         )
                     except Exception as card_exc:

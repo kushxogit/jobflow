@@ -40,7 +40,7 @@
     {
       "kind": "naukri_playwright",
       "name": "Naukri Jobs",
-      "enabled": true,
+      "enabled": false,
       "priority": 0.88,
       "max_results": 300,
       "pages": 5,
@@ -74,7 +74,7 @@
     {
       "kind": "wellfound_playwright",
       "name": "Wellfound Jobs",
-      "enabled": true,
+      "enabled": false,
       "priority": 0.92,
       "max_results": 300,
       "pages": 10,
@@ -88,7 +88,7 @@
     {
       "kind": "surely_remote_playwright",
       "name": "SurelyRemote Jobs",
-      "enabled": true,
+      "enabled": false,
       "priority": 0.8,
       "max_results": 200,
       "pages": 3,

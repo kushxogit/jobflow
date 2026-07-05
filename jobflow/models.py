@@ -54,6 +54,7 @@ class JobListing:
     seniority: str = ""
     tags: list[str] = field(default_factory=list)
     raw_payload: dict[str, Any] = field(default_factory=dict)
+    is_direct_apply: bool = False
 
     def short_summary(self) -> str:
         location = self.location or "Unknown location"

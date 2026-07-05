@@ -17,7 +17,19 @@ class PipelineTests(unittest.TestCase):
             (root / "data" / "fixtures").mkdir(parents=True, exist_ok=True)
 
             shutil.copy(Path.cwd() / "config" / "profile.yaml", root / "config" / "profile.yaml")
-            shutil.copy(Path.cwd() / "config" / "sources.yaml", root / "config" / "sources.yaml")
+            import json
+            sources_path = root / "config" / "sources.yaml"
+            shutil.copy(Path.cwd() / "config" / "sources.yaml", sources_path)
+            with open(sources_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            for src in data.get("sources", []):
+                if src.get("kind") == "fixture":
+                    src["enabled"] = True
+                else:
+                    src["enabled"] = False
+            with open(sources_path, "w", encoding="utf-8") as f:
+                json.dump(data, f)
+
             shutil.copy(
                 Path.cwd() / "data" / "fixtures" / "sample_jobs.json",
                 root / "data" / "fixtures" / "sample_jobs.json",

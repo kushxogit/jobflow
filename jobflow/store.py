@@ -55,6 +55,10 @@ class JobStore:
                 connection.execute("ALTER TABLE seen_jobs ADD COLUMN notion_page_id TEXT DEFAULT ''")
             except sqlite3.OperationalError:
                 pass  # Column already exists
+            try:
+                connection.execute("ALTER TABLE seen_jobs ADD COLUMN is_direct_apply INTEGER DEFAULT 0")
+            except sqlite3.OperationalError:
+                pass  # Column already exists
             connection.execute(
                 """
                 CREATE TABLE IF NOT EXISTS review_actions (
@@ -103,13 +107,14 @@ class JobStore:
                 """
                 INSERT INTO seen_jobs (
                     fingerprint, source, source_job_id, title, company, url, score,
-                    status, notion_page_id, first_seen_at, last_seen_at, raw_json
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    status, notion_page_id, first_seen_at, last_seen_at, raw_json, is_direct_apply
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(fingerprint) DO UPDATE SET
                     score = excluded.score,
                     status = excluded.status,
                     last_seen_at = excluded.last_seen_at,
-                    raw_json = excluded.raw_json
+                    raw_json = excluded.raw_json,
+                    is_direct_apply = excluded.is_direct_apply
                 """,
                 (
                     fingerprint,
@@ -124,6 +129,7 @@ class JobStore:
                     now,
                     now,
                     payload,
+                    1 if job.is_direct_apply else 0,
                 ),
             )
         return fingerprint
@@ -291,6 +297,7 @@ class JobStore:
             seniority=str(payload.get("seniority", "")),
             tags=[str(item) for item in payload.get("tags", [])],
             raw_payload=dict(payload.get("raw_payload", {})),
+            is_direct_apply=bool(payload.get("is_direct_apply", False)),
         )
 
     def review_history(self, fingerprint: str) -> list[dict[str, object]]:

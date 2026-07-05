@@ -87,15 +87,18 @@ class TelegramClient:
         else:
             callback_id = str(callback_id)[:32]
             
+        buttons = [
+            {"text": "✅ Approve", "callback_data": f"approve:{callback_id}"},
+            {"text": "⏭ Skip", "callback_data": f"skip:{callback_id}"},
+        ]
+        if getattr(score.job, "is_direct_apply", False):
+            buttons.append({"text": "⚡ Auto-Apply", "callback_data": f"auto_apply:{callback_id}"})
+
         keyboard = {
-            "inline_keyboard": [
-                [
-                    {"text": "✅ Approve", "callback_data": f"approve:{callback_id}"},
-                    {"text": "⏭ Skip", "callback_data": f"skip:{callback_id}"},
-                ]
-            ]
+            "inline_keyboard": [buttons]
         }
         remote_tag = "🌐 Remote" if score.job.remote else "🏢 On-site"
+        direct_tag = "  |  ⚡ Easy Apply" if getattr(score.job, "is_direct_apply", False) else ""
         salary_text = ""
         if score.job.salary_min and score.job.salary_max:
             salary_text = f"\n💰 {score.job.salary_currency} {score.job.salary_min:,.0f}–{score.job.salary_max:,.0f}"
@@ -104,7 +107,7 @@ class TelegramClient:
         message = (
             f"<b>{html.escape(score.job.title[:150])}</b>\n"
             f"🏷 {html.escape(score.job.company[:50])} · {html.escape(score.job.location[:50])}\n"
-            f"{remote_tag}{html.escape(salary_text)}\n"
+            f"{remote_tag}{direct_tag}{html.escape(salary_text)}\n"
             f"📊 Match: {score.match_percent}%  |  Score: {score.score:.2f}\n"
             f"🔗 {html.escape(score.job.url[:800])}\n\n"
             f"💡 {html.escape(score.explanation()[:1000])}"

@@ -37,6 +37,32 @@ def build_parser() -> argparse.ArgumentParser:
 
     packet_parser = subparsers.add_parser("build-packet", help="Build one tailored packet from a stored fingerprint")
     packet_parser.add_argument("fingerprint", help="Job fingerprint from the SQLite store")
+
+    # Daemon — background scheduler
+    daemon_parser = subparsers.add_parser(
+        "daemon",
+        help="Run the pipeline on a recurring schedule in the background",
+    )
+    daemon_parser.add_argument(
+        "--hours", type=float, default=6.0,
+        help="Interval between pipeline runs in hours (default: 6)",
+    )
+    daemon_parser.add_argument(
+        "--poll-seconds", type=int, default=30,
+        help="Interval between Telegram polls in seconds (default: 30)",
+    )
+    daemon_parser.add_argument("--dry-run", action="store_true", help="Force dry-run integrations")
+
+    # Dashboard — web UI
+    dashboard_parser = subparsers.add_parser(
+        "dashboard",
+        help="Launch the Streamlit web dashboard",
+    )
+    dashboard_parser.add_argument(
+        "--port", type=int, default=8501,
+        help="Port for the Streamlit server (default: 8501)",
+    )
+
     return parser
 
 
@@ -52,6 +78,19 @@ def main(argv: list[str] | None = None) -> int:
 
     if command == "login":
         return _run_login_flow(config, getattr(args, "sites", None))
+
+    if command == "daemon":
+        from .daemon import run_daemon
+        run_daemon(
+            root_dir=args.root,
+            interval_hours=args.hours,
+            dry_run=getattr(args, "dry_run", False),
+            poll_interval_seconds=args.poll_seconds,
+        )
+        return 0
+
+    if command == "dashboard":
+        return _run_dashboard(config, getattr(args, "port", 8501))
 
     pipeline = JobFlowPipeline(config)
 
@@ -84,6 +123,39 @@ def main(argv: list[str] | None = None) -> int:
             default=str,
         )
     )
+    return 0
+
+
+def _run_dashboard(config, port: int = 8501) -> int:
+    """Launch the Streamlit dashboard."""
+    import subprocess
+    import sys
+
+    dashboard_path = config.root_dir / "dashboard.py"
+    if not dashboard_path.exists():
+        print(f"Dashboard file not found at {dashboard_path}")
+        return 1
+
+    print(f"\n{'='*55}")
+    print(f"  JobFlow Dashboard")
+    print(f"{'='*55}")
+    print(f"  Starting on http://localhost:{port}")
+    print(f"  Press Ctrl+C to stop")
+    print(f"{'='*55}\n")
+
+    try:
+        subprocess.run(
+            [
+                sys.executable, "-m", "streamlit", "run",
+                str(dashboard_path),
+                "--server.port", str(port),
+                "--server.headless", "true",
+                "--browser.gatherUsageStats", "false",
+            ],
+            cwd=str(config.root_dir),
+        )
+    except KeyboardInterrupt:
+        print("\n[Dashboard] Shutting down.")
     return 0
 
 

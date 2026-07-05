@@ -70,6 +70,23 @@ class JobFlowPipeline:
         # Score all new jobs
         scoring_result = self.scorer.score_many(new_jobs)
 
+        # --- Feature: AI Strict Validation ---
+        unrejected_jobs = [score.job for score in scoring_result.scores if not score.rejected]
+        if unrejected_jobs and self.config.deepseek_api_key and not self.config.llm_dry_run:
+            from .validator import batch_verify_jobs_with_ai
+            print(f"[Pipeline] Running AI validation on {len(unrejected_jobs)} jobs...")
+            ai_results = batch_verify_jobs_with_ai(unrejected_jobs, self.config.deepseek_api_key, self.config.deepseek_model)
+            for score in scoring_result.scores:
+                if not score.rejected and score.job.url in ai_results:
+                    approved, reason = ai_results[score.job.url]
+                    if not approved:
+                        score.rejected = True
+                        if not score.rejection_reasons:
+                            score.rejection_reasons = []
+                        score.rejection_reasons.append(f"ai_rejected: {reason}")
+            print(f"[Pipeline] AI validation complete.")
+
+
         # Persist telemetry for every scored job
         for score in scoring_result.scores:
             try:
@@ -180,6 +197,57 @@ class JobFlowPipeline:
             self.store.update_status(job, "approved", "approved from Telegram")
             self.store.mark_review_action(job, action)
             return {"ok": True, "action": action, "notion": notion_result}
+
+        if action == "auto_apply":
+            score = self.scorer.score(job)
+            packet = self._build_packet(score)
+            self._write_packet(packet)
+            
+            safe_company = "".join(ch for ch in job.company if ch.isalnum() or ch in {"-", "_", " "}).strip() or "company"
+            safe_title = "".join(ch for ch in job.title if ch.isalnum() or ch in {"-", "_", " "}).strip() or "role"
+            base_name = f"{safe_company} - {safe_title}"
+            pdf_path = self.config.output_dir / "packets" / f"{base_name}.pdf"
+            
+            self.store.update_status(job, "applying", "auto-applying from Telegram")
+            
+            from playwright.sync_api import sync_playwright
+            from .applier import JobApplier
+            
+            apply_result = {"success": False, "reason": "Playwright failed to start"}
+            try:
+                with sync_playwright() as p:
+                    context = p.chromium.launch_persistent_context(
+                        user_data_dir=self.config.playwright_user_data_dir,
+                        headless=False,
+                        viewport={"width": 1280, "height": 850},
+                        args=[
+                            "--disable-blink-features=AutomationControlled",
+                        ],
+                    )
+                    page = context.new_page()
+                    applier = JobApplier(page, packet, self.profile, pdf_path)
+                    apply_result = applier.execute_application()
+                    
+                    if apply_result.get("success"):
+                        print("[Pipeline] Form-filler finished. Keeping browser open for review...")
+                        page.wait_for_timeout(20000)
+                    
+                    context.close()
+            except Exception as e:
+                print(f"[Pipeline] Auto-apply exception: {e}")
+                apply_result = {"success": False, "reason": str(e)}
+            
+            status = "applied" if apply_result.get("success") else "apply_failed"
+            self.store.update_status(job, status, f"Auto-apply result: {apply_result.get('reason')}")
+            self.store.mark_review_action(job, action, apply_result)
+            
+            if notion_page_id:
+                try:
+                    notion_status = "Approved" if apply_result.get("success") else "Needs Review"
+                    self.notion.update_status(notion_page_id, notion_status)
+                except Exception:
+                    pass
+            return {"ok": True, "action": action, "apply_result": apply_result}
 
         return {"ok": False, "reason": "unknown_action"}
 

@@ -201,13 +201,14 @@ def normalize_salary_to_monthly_inr(
 
 def extract_experience_range(text: str) -> tuple[float | None, float | None]:
     """Extract (min_years, max_years) from job description."""
-    # Patterns like "3-5 years", "2+ years", "minimum 2 years"
+    # Patterns like "3-5 years", "2+ years", "minimum 2 years", "3+ yrs", "3 to 5 yrs"
     patterns = [
-        r"(\d+)\s*[-–to]+\s*(\d+)\s*years?",
-        r"(\d+)\+\s*years?",
-        r"minimum\s+(\d+)\s*years?",
-        r"at\s+least\s+(\d+)\s*years?",
-        r"(\d+)\s*years?\s+(?:of\s+)?experience",
+        r"(\d+)\s*[-–to]+\s*(\d+)\s*(?:years?|yrs?)",
+        r"(\d+)\+\s*(?:years?|yrs?)",
+        r"minimum\s+(\d+)\s*(?:years?|yrs?)",
+        r"at\s+least\s+(\d+)\s*(?:years?|yrs?)",
+        r"(\d+)\s*(?:years?|yrs?)\s+(?:of\s+)?(?:relevant\s+)?experience",
+        r"experience\s*:\s*(\d+)\+?\s*(?:years?|yrs?)",
     ]
     for pattern in patterns:
         match = re.search(pattern, text, re.I)
@@ -231,6 +232,24 @@ class ScoringResult:
     @property
     def shortlisted(self) -> list[JobScore]:
         return [item for item in self.scores if not item.rejected]
+
+
+SYNONYMS: dict[str, list[str]] = {
+    "aws": ["amazon web services", "ec2", "s3", "rds", "lambda"],
+    "gcp": ["google cloud", "google cloud platform", "bigquery", "gcs"],
+    "azure": ["microsoft azure", "azure devops"],
+    "js": ["javascript", "es6", "ecmascript"],
+    "ts": ["typescript"],
+    "python": ["django", "flask", "fastapi", "pandas", "numpy"],
+    "kubernetes": ["k8s", "helm"],
+    "ml": ["machine learning", "deep learning", "ai", "artificial intelligence"],
+    "nlp": ["natural language processing", "llm", "large language model"],
+    "react": ["reactjs", "react.js", "nextjs", "next.js"],
+    "node": ["nodejs", "node.js", "expressjs", "express.js"],
+    "postgres": ["postgresql", "postgres sql"],
+    "sql": ["mysql", "sqlite", "oracle", "sql server"],
+    "ci/cd": ["cicd", "github actions", "gitlab ci", "jenkins", "circleci"],
+}
 
 
 # ---------------------------------------------------------------------------
@@ -348,11 +367,20 @@ class RelevanceScorer:
             ScoreSignal("velocity", s_velocity, []),
         ]
 
+        # Compute matched terms
+        job_text = " ".join([job.title, job.description, " ".join(job.tags)]).lower()
+        matched_terms = []
+        for tier in ["tier_1", "tier_2", "tier_3"]:
+            skill_set = self._tier1 if tier == "tier_1" else (self._tier2 if tier == "tier_2" else self._tier3)
+            for skill in skill_set:
+                if self._check_skill_match_isolated(skill, job_text):
+                    matched_terms.append(skill)
+
         return JobScore(
             job=job,
             score=score,
             signals=signals,
-            matched_terms=[],
+            matched_terms=matched_terms,
             rejected=rejected,
             rejection_reasons=rejection_reasons,
             match_percent=int(round(score * 100)),
@@ -365,9 +393,9 @@ class RelevanceScorer:
     def _check_hard_filters(self, job: JobListing, work_mode: WorkMode) -> list[str]:
         reasons: list[str] = []
 
-        # Work mode
-        if work_mode.value not in self._allowed_modes and work_mode != WorkMode.UNKNOWN:
-            reasons.append("work_mode_not_allowed")
+        # Strict Work Mode: Must be Remote
+        if work_mode != WorkMode.REMOTE:
+            reasons.append("must_be_remote")
 
         # Freshness
         age = self._job_age_days(job)
@@ -380,6 +408,17 @@ class RelevanceScorer:
         )
         if max_inr is not None and confidence >= 0.8 and max_inr < self._salary_floor:
             reasons.append("salary_below_floor")
+
+        # Strict Seniority Check
+        job_title_lower = normalize_title(job.title)
+        senior_keywords = ["senior", "sr", "lead", "manager", "sde 3", "sde iii", "staff", "principal"]
+        if any(keyword in job_title_lower for keyword in senior_keywords) or re.search(r"\b3\b", job_title_lower):
+            reasons.append("seniority_not_allowed")
+
+        # Strict Experience Check
+        exp_min, exp_max = extract_experience_range(job.description)
+        if exp_min is not None and exp_min > 2.0:
+            reasons.append("experience_too_high")
 
         return reasons
 
@@ -400,6 +439,18 @@ class RelevanceScorer:
                 return 0.6
         return 0.0
 
+    def _check_skill_match_isolated(self, skill: str, text: str) -> bool:
+        s_clean = skill.lower().strip()
+        skill_variants = {s_clean, s_clean.replace(".", ""), s_clean.replace(".js", " js")}
+        if any(v in text for v in skill_variants):
+            return True
+        for canonical, syns in SYNONYMS.items():
+            if s_clean == canonical or s_clean in syns:
+                all_variants = [canonical] + syns
+                if any(v in text for v in all_variants):
+                    return True
+        return False
+
     def _skill_score(self, job: JobListing) -> float:
         job_text = " ".join([job.title, job.description, " ".join(job.tags)]).lower()
         matched = 0.0
@@ -408,9 +459,7 @@ class RelevanceScorer:
             skill_set = self._tier1 if tier == "tier_1" else (self._tier2 if tier == "tier_2" else self._tier3)
             for skill in skill_set:
                 total += weight
-                # Check both exact and common abbreviations
-                skill_variants = [skill, skill.replace(".", ""), skill.replace(".js", " js")]
-                if any(v in job_text for v in skill_variants):
+                if self._check_skill_match_isolated(skill, job_text):
                     matched += weight
         return round(matched / total, 4) if total > 0 else 0.0
 
