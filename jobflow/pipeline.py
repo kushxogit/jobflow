@@ -72,10 +72,10 @@ class JobFlowPipeline:
 
         # --- Feature: AI Strict Validation ---
         unrejected_jobs = [score.job for score in scoring_result.scores if not score.rejected]
-        if unrejected_jobs and self.config.deepseek_api_key and not self.config.llm_dry_run:
+        if unrejected_jobs and self.config.openrouter_api_key and not self.config.llm_dry_run:
             from .validator import batch_verify_jobs_with_ai
-            print(f"[Pipeline] Running AI validation on {len(unrejected_jobs)} jobs...")
-            ai_results = batch_verify_jobs_with_ai(unrejected_jobs, self.config.deepseek_api_key, self.config.deepseek_model)
+            print(f"[Pipeline] Running AI validation on {len(unrejected_jobs)} jobs via OpenRouter...")
+            ai_results = batch_verify_jobs_with_ai(unrejected_jobs, self.profile, self.config.openrouter_api_key)
             for score in scoring_result.scores:
                 if not score.rejected and score.job.url in ai_results:
                     approved, reason = ai_results[score.job.url]

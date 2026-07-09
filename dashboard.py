@@ -28,11 +28,11 @@ st.set_page_config(page_title="JobFlow", page_icon="□", layout="wide",
 
 st.markdown("""
 <style>
-/* ── Font ── */
+/* ── Font Import ── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 * {
-    font-family: "Neue Haas Grotesk Display Pro", "NeueHaasGroteskDisplayPro",
-                 "Neue Haas Grotesk Text Pro", HelveticaNeue, "Helvetica Neue",
-                 Helvetica, -apple-system, BlinkMacSystemFont, Arial, sans-serif !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
 }
 
 /* ── Hide Streamlit chrome ── */
@@ -43,257 +43,319 @@ header[data-testid="stHeader"],
 section[data-testid="stSidebar"] { display: none !important; }
 
 /* ── Base ── */
-html, body, .stApp { background: #fafafa; color: #111; }
+html, body, .stApp { 
+    background: #0B0F19; /* Rich dark slate */
+    color: #F3F4F6; 
+}
 .main .block-container {
-    padding-top: 88px !important;
-    padding-left: 40px !important;
-    padding-right: 40px !important;
-    max-width: 100% !important;
+    padding-top: 100px !important;
+    padding-left: 5% !important;
+    padding-right: 5% !important;
+    max-width: 1400px !important;
 }
 
-/* ── Fixed top nav ── */
+/* ── Fixed top nav (Glassmorphism) ── */
 .jf-nav {
     position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
-    background: #111; height: 52px;
+    background: rgba(11, 15, 25, 0.75); 
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    height: 64px;
     display: flex; align-items: stretch;
-    border-bottom: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
 .jf-nav-logo {
-    font-size: 0.78rem; font-weight: 700; letter-spacing: 0.18em;
-    text-transform: uppercase; color: #fff;
-    padding: 0 28px; display: flex; align-items: center;
-    border-right: 1px solid #2a2a2a; white-space: nowrap;
+    font-size: 0.9rem; font-weight: 700; letter-spacing: 0.15em;
+    text-transform: uppercase; 
+    background: linear-gradient(135deg, #60A5FA, #A78BFA);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    padding: 0 32px; display: flex; align-items: center;
+    border-right: 1px solid rgba(255,255,255,0.08); white-space: nowrap;
 }
 .jf-nav a {
-    color: #666; text-decoration: none;
-    font-size: 0.73rem; font-weight: 500; letter-spacing: 0.06em;
-    text-transform: uppercase; padding: 0 22px;
+    color: #9CA3AF; text-decoration: none;
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; padding: 0 24px;
     display: flex; align-items: center;
-    transition: color 0.12s, background 0.12s;
+    transition: color 0.2s, background 0.2s, border-color 0.2s;
     border-bottom: 2px solid transparent;
 }
-.jf-nav a:hover { color: #fff; background: #1c1c1c; text-decoration: none; }
-.jf-nav a.active { color: #fff; border-bottom-color: #fff; }
+.jf-nav a:hover { color: #F3F4F6; background: rgba(255,255,255,0.03); text-decoration: none; }
+.jf-nav a.active { color: #60A5FA; border-bottom-color: #60A5FA; }
 .jf-nav-right {
     margin-left: auto; display: flex; align-items: center;
-    padding: 0 24px; font-size: 0.7rem; color: #555;
-    white-space: nowrap;
+    padding: 0 32px; font-size: 0.75rem; color: #9CA3AF;
+    white-space: nowrap; font-weight: 500;
 }
 
 /* ── Stat strip ── */
 .jf-stats {
-    display: flex; gap: 0; margin-bottom: 20px;
-    border: 1px solid #e4e4e4; background: #fff;
+    display: flex; gap: 16px; margin-bottom: 32px;
 }
 .jf-stat {
-    flex: 1; padding: 14px 18px; border-right: 1px solid #e4e4e4;
+    flex: 1; padding: 20px; 
+    background: rgba(30, 41, 59, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
     text-align: center;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
 }
-.jf-stat:last-child { border-right: none; }
-.jf-stat-n { font-size: 1.6rem; font-weight: 600; color: #111; line-height: 1; }
+.jf-stat:hover { 
+    transform: translateY(-4px); 
+    background: rgba(30, 41, 59, 0.8);
+    border-color: rgba(96, 165, 250, 0.4);
+}
+.jf-stat-n { font-size: 1.8rem; font-weight: 700; color: #F3F4F6; line-height: 1; }
 .jf-stat-l {
-    font-size: 0.62rem; font-weight: 600; letter-spacing: 0.14em;
-    text-transform: uppercase; color: #bbb; margin-top: 3px;
+    font-size: 0.65rem; font-weight: 600; letter-spacing: 0.15em;
+    text-transform: uppercase; color: #9CA3AF; margin-top: 6px;
 }
 
 /* ── Calendar ── */
 .jf-cal {
-    border: 1px solid #e4e4e4; background: #fff;
-    padding: 18px 22px; margin-bottom: 20px;
+    background: rgba(30, 41, 59, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 24px 32px; margin-bottom: 32px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 .jf-cal-head {
-    display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 16px; margin-bottom: 20px;
 }
 .jf-cal-month {
-    font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em;
-    text-transform: uppercase; color: #111;
+    font-size: 0.85rem; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: #F3F4F6;
 }
 .jf-cal-arrow {
-    color: #111; text-decoration: none;
-    font-size: 0.85rem; font-weight: 700;
-    padding: 3px 9px; border: 1px solid #e4e4e4;
-    line-height: 1.4; transition: background 0.12s;
+    color: #9CA3AF; text-decoration: none;
+    font-size: 0.9rem; font-weight: 700;
+    padding: 4px 12px; 
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    line-height: 1.4; transition: all 0.2s;
 }
-.jf-cal-arrow:hover { background: #f0f0f0; text-decoration: none; color: #111; }
+.jf-cal-arrow:hover { background: rgba(255,255,255,0.1); color: #F3F4F6; text-decoration: none; }
 .jf-cal-clear {
-    margin-left: auto; font-size: 0.68rem; color: #bbb;
-    text-decoration: none; letter-spacing: 0.06em; text-transform: uppercase;
+    margin-left: auto; font-size: 0.7rem; color: #EF4444;
+    text-decoration: none; letter-spacing: 0.08em; text-transform: uppercase;
+    font-weight: 600; padding: 4px 12px; border-radius: 8px;
+    background: rgba(239, 68, 68, 0.1); transition: all 0.2s;
 }
-.jf-cal-clear:hover { color: #111; text-decoration: none; }
+.jf-cal-clear:hover { background: rgba(239, 68, 68, 0.2); color: #FCA5A5; text-decoration: none; }
 .jf-cal-grid {
-    display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px;
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;
 }
 .jf-cal-dow {
-    font-size: 0.6rem; font-weight: 700; letter-spacing: 0.14em;
-    text-transform: uppercase; color: #ccc; text-align: center;
-    padding: 4px 0 8px;
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.15em;
+    text-transform: uppercase; color: #6B7280; text-align: center;
+    padding: 4px 0 12px;
 }
 .jf-cal-d {
-    display: block; text-align: center; padding: 6px 3px;
-    font-size: 0.76rem; font-weight: 500;
-    text-decoration: none; color: #ccc;
-    transition: background 0.1s;
-    position: relative;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 10px 0; font-size: 0.85rem; font-weight: 500;
+    text-decoration: none; color: #6B7280;
+    border-radius: 10px; transition: all 0.2s;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid transparent;
 }
-.jf-cal-d:hover { background: #f5f5f5; text-decoration: none; color: #111; }
-.jf-cal-d.has  { color: #111; background: #dcfce7; font-weight: 600; }
-.jf-cal-d.has:hover { background: #bbf7d0; text-decoration: none; }
-.jf-cal-d.sel  { background: #111 !important; color: #fff !important; font-weight: 700; }
-.jf-cal-d.sel:hover { background: #333 !important; text-decoration: none; color: #fff !important; }
+.jf-cal-d:hover { background: rgba(255, 255, 255, 0.05); text-decoration: none; color: #F3F4F6; }
+.jf-cal-d.has  { color: #F3F4F6; background: rgba(59, 130, 246, 0.15); font-weight: 600; border: 1px solid rgba(59, 130, 246, 0.3); }
+.jf-cal-d.has:hover { background: rgba(59, 130, 246, 0.25); text-decoration: none; }
+.jf-cal-d.sel  { background: linear-gradient(135deg, #3B82F6, #8B5CF6) !important; color: #FFF !important; font-weight: 700; border: none; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4); }
+.jf-cal-d.sel:hover { opacity: 0.9; text-decoration: none; }
 .jf-cal-d.empty { visibility: hidden; }
 .jf-cal-dot {
-    display: block; width: 3px; height: 3px; background: #111;
-    border-radius: 50%; margin: 2px auto 0; opacity: 0.5;
+    display: block; width: 4px; height: 4px; background: #60A5FA;
+    border-radius: 50%; margin-top: 4px; 
 }
 
 /* ── Job rows ── */
-.jf-list { border-top: 2px solid #111; }
+.jf-list { display: flex; flex-direction: column; gap: 16px; margin-top: 8px; }
 .jf-row {
     display: flex; justify-content: space-between; align-items: flex-start;
-    gap: 20px; padding: 14px 0; border-bottom: 1px solid #e4e4e4;
+    gap: 24px; padding: 20px 24px; 
+    background: rgba(30, 41, 59, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    backdrop-filter: blur(12px);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.jf-row:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    border-color: rgba(255,255,255,0.15);
 }
 .jf-row-l { flex: 1; min-width: 0; }
 .jf-title {
-    font-size: 0.9rem; font-weight: 600; color: #111;
+    font-size: 1.05rem; font-weight: 600; color: #F3F4F6;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    margin-bottom: 3px;
+    margin-bottom: 6px;
 }
-.jf-sub { font-size: 0.72rem; color: #888; margin-bottom: 6px; }
-.jf-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.jf-sub { font-size: 0.8rem; color: #9CA3AF; margin-bottom: 12px; font-weight: 500; }
+.jf-tags { display: flex; gap: 8px; flex-wrap: wrap; }
 .jf-tag {
-    font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em;
-    text-transform: uppercase; padding: 2px 7px;
-    border: 1px solid currentColor;
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; padding: 4px 10px;
+    border-radius: 6px;
 }
-.jf-g  { color: #16a34a; }
-.jf-b  { color: #2563eb; }
-.jf-r  { color: #dc2626; }
-.jf-gr { color: #9ca3af; }
+.jf-g  { background: rgba(16, 185, 129, 0.15); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.3); }
+.jf-b  { background: rgba(59, 130, 246, 0.15); color: #60A5FA; border: 1px solid rgba(59, 130, 246, 0.3); }
+.jf-r  { background: rgba(239, 68, 68, 0.15); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+.jf-gr { background: rgba(156, 163, 175, 0.15); color: #9CA3AF; border: 1px solid rgba(156, 163, 175, 0.3); }
 .jf-row-r {
     text-align: right; flex-shrink: 0;
-    font-size: 0.7rem; color: #bbb; line-height: 1.9;
+    font-size: 0.75rem; color: #9CA3AF; line-height: 1.8;
 }
-.jf-score { font-size: 1.05rem; font-weight: 700; color: #111; }
-.jf-empty { font-size: 0.8rem; color: #bbb; padding: 28px 0; }
+.jf-score { font-size: 1.3rem; font-weight: 700; color: #60A5FA; }
+.jf-empty { font-size: 0.9rem; color: #6B7280; padding: 40px 0; text-align: center; font-weight: 500; }
 
 /* ── Streamlit buttons — robust overrides ── */
 .stButton > button {
-    background: #fff !important;
-    color: #111 !important;
-    border: 1px solid #111 !important;
-    border-radius: 0 !important;
-    font-size: 0.68rem !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.1em !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: #F3F4F6 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 8px !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.08em !important;
     text-transform: uppercase !important;
-    padding: 5px 14px !important;
-    line-height: 1.4 !important;
-    min-height: 28px !important;
+    padding: 6px 16px !important;
+    line-height: 1.5 !important;
+    min-height: 34px !important;
     box-shadow: none !important;
-    transition: background 0.12s, color 0.12s !important;
+    transition: all 0.2s !important;
 }
 .stButton > button:hover,
 .stButton > button:active {
-    background: #111 !important;
-    color: #fff !important;
-    border-color: #111 !important;
-    box-shadow: none !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: #FFF !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    transform: translateY(-1px) !important;
 }
 .stButton > button:focus:not(:active) {
-    box-shadow: 0 0 0 2px #111 !important;
+    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.5) !important;
     outline: none !important;
 }
 
 /* ── Link button ── */
 a[data-testid="stLinkButton-link"] {
-    background: #fff !important;
-    color: #111 !important;
-    border: 1px solid #111 !important;
-    border-radius: 0 !important;
-    font-size: 0.68rem !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.1em !important;
+    background: linear-gradient(135deg, #3B82F6, #8B5CF6) !important;
+    color: #FFF !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.08em !important;
     text-transform: uppercase !important;
-    padding: 5px 14px !important;
-    line-height: 1.4 !important;
+    padding: 6px 16px !important;
+    line-height: 1.5 !important;
     text-decoration: none !important;
     display: inline-flex !important;
     align-items: center !important;
-    transition: background 0.12s, color 0.12s !important;
+    transition: all 0.2s !important;
+    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3) !important;
 }
 a[data-testid="stLinkButton-link"]:hover {
-    background: #111 !important;
-    color: #fff !important;
+    opacity: 0.9 !important;
+    transform: translateY(-1px) !important;
     text-decoration: none !important;
+    box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4) !important;
 }
 
 /* ── Inputs ── */
-.stTextInput input {
-    border: 1px solid #e4e4e4 !important;
-    border-radius: 0 !important;
-    background: #fff !important;
-    font-size: 0.8rem !important;
-    padding: 7px 12px !important;
-    box-shadow: none !important;
+.stTextInput input, .stSelectbox > div > div {
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 8px !important;
+    background: rgba(15, 23, 42, 0.6) !important;
+    color: #F3F4F6 !important;
+    font-size: 0.85rem !important;
+    padding: 10px 16px !important;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1) !important;
+    transition: border-color 0.2s, box-shadow 0.2s !important;
 }
-.stTextInput input:focus {
-    border-color: #111 !important;
-    box-shadow: none !important;
+.stTextInput input:focus, .stSelectbox > div > div:focus-within {
+    border-color: #60A5FA !important;
+    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3), inset 0 2px 4px rgba(0,0,0,0.1) !important;
 }
-.stSelectbox > div > div {
-    border: 1px solid #e4e4e4 !important;
-    border-radius: 0 !important;
-    font-size: 0.8rem !important;
-    box-shadow: none !important;
+.stSelectbox * {
+    color: #F3F4F6 !important;
+    background: #0B0F19 !important;
 }
 
 /* ── Expander ── */
+details[data-testid="stExpander"] {
+    background: rgba(30, 41, 59, 0.4) !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    border-radius: 12px !important;
+    overflow: hidden;
+}
 details[data-testid="stExpander"] summary {
-    border: 1px solid #e4e4e4 !important;
-    border-radius: 0 !important;
-    padding: 7px 12px !important;
-    font-size: 0.65rem !important;
-    font-weight: 700 !important;
+    padding: 12px 16px !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
     letter-spacing: 0.1em !important;
     text-transform: uppercase !important;
-    background: #fafafa !important;
-    color: #888 !important;
+    background: rgba(255, 255, 255, 0.02) !important;
+    color: #9CA3AF !important;
+    transition: background 0.2s, color 0.2s !important;
 }
-details[data-testid="stExpander"] summary:hover { background: #f0f0f0 !important; }
+details[data-testid="stExpander"] summary:hover { 
+    background: rgba(255, 255, 255, 0.05) !important; 
+    color: #F3F4F6 !important;
+}
+details[data-testid="stExpander"] .streamlit-expanderContent {
+    color: #D1D5DB !important;
+    font-size: 0.85rem !important;
+    line-height: 1.6 !important;
+}
 
 /* ── Tabs ── */
 .stTabs [data-baseweb="tab-list"] {
     background: transparent !important;
-    border-bottom: 1px solid #e4e4e4 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
     gap: 0 !important;
 }
 .stTabs [data-baseweb="tab"] {
     background: transparent !important;
     border-radius: 0 !important;
     border: none !important;
-    font-size: 0.68rem !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.1em !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.08em !important;
     text-transform: uppercase !important;
-    color: #aaa !important;
-    padding: 8px 20px !important;
+    color: #6B7280 !important;
+    padding: 12px 24px !important;
+    transition: color 0.2s !important;
+}
+.stTabs [data-baseweb="tab"]:hover {
+    color: #9CA3AF !important;
 }
 .stTabs [aria-selected="true"] {
-    color: #111 !important;
-    border-bottom: 2px solid #111 !important;
+    color: #60A5FA !important;
+    border-bottom: 2px solid #60A5FA !important;
 }
 
 /* ── Section labels ── */
 .jf-section {
-    font-size: 0.62rem; font-weight: 700; letter-spacing: 0.18em;
-    text-transform: uppercase; color: #bbb; margin-bottom: 14px;
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 0.15em;
+    text-transform: uppercase; color: #9CA3AF; margin-bottom: 20px; margin-top: 10px;
+    display: flex; align-items: center;
+}
+.jf-section::after {
+    content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.08); margin-left: 16px;
 }
 
 /* ── Scrollbar ── */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: #fafafa; }
-::-webkit-scrollbar-thumb { background: #ddd; }
-::-webkit-scrollbar-thumb:hover { background: #bbb; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0B0F19; }
+::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #4B5563; }
 </style>
 """, unsafe_allow_html=True)
 

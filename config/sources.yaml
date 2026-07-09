@@ -74,7 +74,7 @@
     {
       "kind": "wellfound_playwright",
       "name": "Wellfound Jobs",
-      "enabled": false,
+      "enabled": true,
       "priority": 0.92,
       "max_results": 300,
       "pages": 10,

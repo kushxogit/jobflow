@@ -52,6 +52,7 @@ class AppConfig:
     anthropic_model: str = ""
     deepseek_api_key: str = ""
     deepseek_model: str = ""
+    openrouter_api_key: str = ""
     playwright_headless: bool = True
     playwright_user_data_dir: Path = field(default_factory=Path)
     linkedin_username: str = ""
@@ -165,6 +166,7 @@ def load_app_config(root_dir: str | Path | None = None) -> AppConfig:
         anthropic_model=env_text("ANTHROPIC_MODEL", "claude-3-haiku-20240307"),
         deepseek_api_key=env_text("DEEPSEEK_API_KEY", ""),
         deepseek_model=env_text("DEEPSEEK_MODEL", "deepseek-chat"),
+        openrouter_api_key=env_text("OPENROUTER_API_KEY", ""),
         playwright_headless=env_flag("PLAYWRIGHT_HEADLESS", True),
         playwright_user_data_dir=playwright_dir,
         linkedin_username=env_text("LINKEDIN_USERNAME", ""),
