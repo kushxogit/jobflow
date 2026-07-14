@@ -30,22 +30,29 @@ if (Get-Command python -ErrorAction SilentlyContinue) {
 
 # 3. Setup Python Virtual Environment
 Write-Host "`nSetting up Python Virtual Environment (.venv)..." -ForegroundColor Yellow
-if (-Not (Test-Path ".venv")) {
+$venvPython = ".\.venv\Scripts\python.exe"
+
+if (-Not (Test-Path $venvPython)) {
+    Write-Host "[!] Virtual environment not found or incomplete. Creating..." -ForegroundColor Yellow
+    if (Test-Path ".venv") {
+        Remove-Item -Recurse -Force ".venv"
+    }
     python -m venv .venv
     Write-Host "[-] Virtual environment created." -ForegroundColor Green
 } else {
-    Write-Host "[-] Virtual environment already exists." -ForegroundColor Green
+    Write-Host "[-] Virtual environment already exists and appears valid." -ForegroundColor Green
 }
 
 # 4. Install Backend Dependencies
 Write-Host "`nInstalling Backend Dependencies..." -ForegroundColor Yellow
-& .\.venv\Scripts\python.exe -m pip install --upgrade pip
-& .\.venv\Scripts\python.exe -m pip install -e .
+& $venvPython -m pip install --upgrade pip
+& $venvPython -m pip install -e .
 Write-Host "[-] Backend dependencies installed." -ForegroundColor Green
 
 # 5. Install Playwright Browsers
 Write-Host "`nInstalling Playwright Browsers..." -ForegroundColor Yellow
-& .\.venv\Scripts\playwright.exe install
+$venvPlaywright = ".\.venv\Scripts\playwright.exe"
+& $venvPlaywright install
 Write-Host "[-] Playwright browsers installed." -ForegroundColor Green
 
 # 6. Install Frontend Dependencies
